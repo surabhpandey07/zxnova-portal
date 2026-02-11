@@ -129,33 +129,23 @@ export default function Invoices() {
     <>
       <style>{`
         @media print {
-          * {
+          body {
+            background: white !important;
             margin: 0 !important;
             padding: 0 !important;
-            border: none !important;
           }
           
-          html, body {
-            width: 100% !important;
-            height: 100% !important;
-            background: white !important;
+          /* Hide specific layout elements */
+          .print-hide {
+            display: none !important;
           }
           
-          /* Hide sidebar and layout */
-          aside,
-          nav,
-          header,
-          .print-hide,
-          button,
-          input,
-          select,
-          textarea,
+          /* Hide AdminLayout components */
           [class*="sidebar"],
           [class*="Sidebar"],
-          [class*="layout"],
-          [class*="Layout"],
-          .flex,
-          .space-y-6 {
+          header,
+          nav,
+          aside {
             display: none !important;
           }
           
@@ -164,23 +154,17 @@ export default function Invoices() {
             display: block !important;
             background: white !important;
             color: black !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
             page-break-inside: avoid !important;
-            width: 100% !important;
           }
           
-          .invoice-template-wrapper * {
-            background: inherit !important;
-            color: inherit !important;
-            margin: 0 !important;
-            padding: inherit !important;
-          }
-          
-          /* Ensure text is visible */
-          div, p, span, h1, h2, h3, table, tr, td, th {
-            page-break-inside: avoid !important;
+          /* Ensure content is visible */
+          .invoice-template-wrapper p,
+          .invoice-template-wrapper span,
+          .invoice-template-wrapper h1,
+          .invoice-template-wrapper h2,
+          .invoice-template-wrapper h3,
+          .invoice-template-wrapper td,
+          .invoice-template-wrapper th {
             color: black !important;
             background: white !important;
           }
