@@ -68,12 +68,12 @@ export default function Home() {
           <section className="text-center space-y-6 py-12">
             <h3 className="text-3xl font-bold text-white">Ready to Get Started?</h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-3 bg-gradient-to-r from-zxnova-primary to-zxnova-accent text-white font-semibold rounded-lg hover:opacity-90 transition">
+              <a href="/dashboard" className="px-8 py-3 bg-gradient-to-r from-zxnova-primary to-zxnova-accent text-white font-semibold rounded-lg hover:opacity-90 transition inline-block">
                 Launch Dashboard
-              </button>
-              <button className="px-8 py-3 border border-zxnova-accent text-zxnova-accent font-semibold rounded-lg hover:bg-zxnova-accent/10 transition">
+              </a>
+              <a href="#" className="px-8 py-3 border border-zxnova-accent text-zxnova-accent font-semibold rounded-lg hover:bg-zxnova-accent/10 transition inline-block">
                 Learn More
-              </button>
+              </a>
             </div>
           </section>
         </div>
