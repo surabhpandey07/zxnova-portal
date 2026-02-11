@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { useBusinessStore } from '@/store/business';
@@ -124,56 +126,40 @@ export default function Invoices() {
   const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.status === 'Paid' ? (inv as any).total || 0 : 0), 0);
   const pendingAmount = invoices.reduce((sum, inv) => sum + (inv.status === 'Pending' ? (inv as any).total || 0 : 0), 0);
 
+  React.useEffect(() => {
+    const printStyle = document.createElement('style');
+    printStyle.innerHTML = `
+      @media print {
+        body {
+          background: white;
+          margin: 0;
+          padding: 0;
+        }
+        
+        /* Hide everything except invoice */
+        body > * {
+          display: none !important;
+        }
+        
+        .invoice-template-wrapper {
+          display: block !important;
+          background: white;
+          color: black;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    `;
+    document.head.appendChild(printStyle);
+    return () => {
+      document.head.removeChild(printStyle);
+    };
+  }, []);
+
 
   return (
-    <>
-      <style>{`
-        @media print {
-          body {
-            background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          
-          /* Hide specific layout elements */
-          .print-hide {
-            display: none !important;
-          }
-          
-          /* Hide AdminLayout components */
-          [class*="sidebar"],
-          [class*="Sidebar"],
-          header,
-          nav,
-          aside {
-            display: none !important;
-          }
-          
-          /* Show invoice template */
-          .invoice-template-wrapper {
-            display: block !important;
-            background: white !important;
-            color: black !important;
-            page-break-inside: avoid !important;
-          }
-          
-          /* Ensure content is visible */
-          .invoice-template-wrapper p,
-          .invoice-template-wrapper span,
-          .invoice-template-wrapper h1,
-          .invoice-template-wrapper h2,
-          .invoice-template-wrapper h3,
-          .invoice-template-wrapper td,
-          .invoice-template-wrapper th {
-            color: black !important;
-            background: white !important;
-          }
-        }
-      `}</style>
-      
-      <div className="invoice-print-wrapper">
-        <AdminLayout>
-        <div className="space-y-6 print-hide">
+    <AdminLayout>
+      <div className="space-y-6 print-hide">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-white">Invoices</h1>
             <button
@@ -576,8 +562,6 @@ export default function Invoices() {
           ))}
         </div>
       </div>
-        </AdminLayout>
-      </div>
-    </>
+    </AdminLayout>
   );
 }
