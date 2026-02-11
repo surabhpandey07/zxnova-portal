@@ -126,51 +126,69 @@ export default function Invoices() {
 
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white">Invoices</h1>
-          <button
-            onClick={() => {
-              setShowForm(!showForm);
-              setViewingInvoiceId(null);
-              setEditingId(null);
-              setFormData({
-                invoiceNo: `INV-${Date.now()}`,
-                clientId: '',
-                date: new Date().toISOString().split('T')[0],
-                dueDate: '',
-                items: [{ description: '', quantity: 1, rate: 0, amount: 0 }],
-                subtotal: 0,
-                gstEnabled: true,
-                gstRate: 18,
-                gstAmount: 0,
-                total: 0,
-                status: 'Draft',
-                notes: '',
-              });
-            }}
-            className="px-6 py-2 bg-gradient-to-r from-zxnova-primary to-zxnova-accent text-white rounded-lg hover:opacity-90 transition"
-          >
-            {showForm ? '✕ Cancel' : '+ Create Invoice'}
-          </button>
-        </div>
+    <>
+      <style>{`
+        @media print {
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          .print-hide {
+            display: none !important;
+          }
+          .invoice-template-wrapper {
+            display: block !important;
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+      `}</style>
+      <AdminLayout>
+        <div className="space-y-6 print-hide">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-white">Invoices</h1>
+            <button
+              onClick={() => {
+                setShowForm(!showForm);
+                setViewingInvoiceId(null);
+                setEditingId(null);
+                setFormData({
+                  invoiceNo: `INV-${Date.now()}`,
+                  clientId: '',
+                  date: new Date().toISOString().split('T')[0],
+                  dueDate: '',
+                  items: [{ description: '', quantity: 1, rate: 0, amount: 0 }],
+                  subtotal: 0,
+                  gstEnabled: true,
+                  gstRate: 18,
+                  gstAmount: 0,
+                  total: 0,
+                  status: 'Draft',
+                  notes: '',
+                });
+              }}
+              className="px-6 py-2 bg-gradient-to-r from-zxnova-primary to-zxnova-accent text-white rounded-lg hover:opacity-90 transition"
+            >
+              {showForm ? '✕ Cancel' : '+ Create Invoice'}
+            </button>
+          </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
-            <p className="text-gray-400 text-sm mb-2">Total Revenue</p>
-            <h3 className="text-3xl font-bold text-white">${totalRevenue.toLocaleString()}</h3>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
+              <p className="text-gray-400 text-sm mb-2">Total Revenue</p>
+              <h3 className="text-3xl font-bold text-white">₹{totalRevenue.toLocaleString()}</h3>
+            </div>
+            <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
+              <p className="text-gray-400 text-sm mb-2">Pending</p>
+              <h3 className="text-3xl font-bold text-yellow-400">₹{pendingAmount.toLocaleString()}</h3>
+            </div>
+            <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
+              <p className="text-gray-400 text-sm mb-2">Total Invoices</p>
+              <h3 className="text-3xl font-bold text-white">{invoices.length}</h3>
+            </div>
           </div>
-          <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
-            <p className="text-gray-400 text-sm mb-2">Pending</p>
-            <h3 className="text-3xl font-bold text-yellow-400">${pendingAmount.toLocaleString()}</h3>
-          </div>
-          <div className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6">
-            <p className="text-gray-400 text-sm mb-2">Total Invoices</p>
-            <h3 className="text-3xl font-bold text-white">{invoices.length}</h3>
-          </div>
-        </div>
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-6 space-y-4">
@@ -353,7 +371,7 @@ export default function Invoices() {
         )}
 
         {/* Invoices List */}
-        <div className="space-y-4">
+        <div className="space-y-4 print-hide">
           {invoices.map((invoice) => (
             <div key={invoice.id} className="bg-white/5 backdrop-blur border border-zxnova-primary/30 rounded-lg p-4">
               <div className="flex justify-between items-center">
@@ -403,7 +421,7 @@ export default function Invoices() {
 
               {/* Invoice Template */}
               {viewingInvoiceId === invoice.id && (
-                <div className="mt-6 bg-white text-gray-900 p-8 rounded-lg print:p-0 print:bg-white print:text-black">
+                <div className="invoice-template-wrapper mt-6 bg-white text-gray-900 p-8 rounded-lg">
                   {/* Header */}
                   <div className="border-b-2 border-gray-300 pb-6 mb-6">
                     <div className="flex justify-between items-start">
@@ -528,5 +546,6 @@ export default function Invoices() {
         </div>
       </div>
     </AdminLayout>
+    </>
   );
 }
