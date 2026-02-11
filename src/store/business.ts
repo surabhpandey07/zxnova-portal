@@ -8,16 +8,33 @@ export interface Client {
   company: string;
   status: 'Active' | 'Inactive' | 'Pending';
   createdAt: string;
+  address?: string;
+  gstNumber?: string;
+}
+
+export interface InvoiceItem {
+  description: string;
+  quantity: number;
+  rate: number;
+  amount: number;
 }
 
 export interface Invoice {
   id: string;
+  invoiceNo: string;
   clientId: string;
-  amount: number;
-  status: 'Paid' | 'Pending' | 'Overdue' | 'Draft';
   date: string;
   dueDate: string;
-  description: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  gstEnabled: boolean;
+  gstRate: number;
+  gstAmount: number;
+  total: number;
+  status: 'Draft' | 'Pending' | 'Paid' | 'Overdue';
+  notes: string;
+  amount?: number;
+  description?: string;
 }
 
 export interface Project {
@@ -51,7 +68,7 @@ interface BusinessStore {
   
   // Invoices
   invoices: Invoice[];
-  addInvoice: (invoice: Omit<Invoice, 'id'>) => void;
+  addInvoice: (invoice: Omit<Invoice, 'id'> & Partial<{id: string}>) => void;
   updateInvoice: (id: string, invoice: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
   
@@ -79,8 +96,10 @@ export const useBusinessStore = create<BusinessStore>((set) => ({
       email: 'contact@acme.com',
       phone: '+1-555-0101',
       company: 'Acme Corp',
-      status: 'Active',
+      status: 'Active' as const,
       createdAt: '2024-01-15',
+      address: '123 Business St, New York, NY 10001',
+      gstNumber: '18AAPCT1234K1Z0',
     },
     {
       id: '2',
@@ -88,8 +107,10 @@ export const useBusinessStore = create<BusinessStore>((set) => ({
       email: 'info@techstartup.com',
       phone: '+1-555-0102',
       company: 'Tech Startup',
-      status: 'Active',
+      status: 'Active' as const,
       createdAt: '2024-01-20',
+      address: '456 Tech Ave, San Francisco, CA 94105',
+      gstNumber: '27AABCT1234K1Z0',
     },
   ],
   
@@ -109,26 +130,42 @@ export const useBusinessStore = create<BusinessStore>((set) => ({
   invoices: [
     {
       id: '1',
+      invoiceNo: 'INV-001',
       clientId: '1',
-      amount: 5000,
-      status: 'Paid',
       date: '2024-02-01',
       dueDate: '2024-02-15',
-      description: 'Website Design & Development',
+      items: [
+        { description: 'Website Design & Development', quantity: 1, rate: 5000, amount: 5000 },
+      ],
+      subtotal: 5000,
+      gstEnabled: true,
+      gstRate: 18,
+      gstAmount: 900,
+      total: 5900,
+      status: 'Paid',
+      notes: 'Thank you for your business!',
     },
     {
       id: '2',
+      invoiceNo: 'INV-002',
       clientId: '2',
-      amount: 3500,
-      status: 'Pending',
       date: '2024-02-05',
       dueDate: '2024-02-20',
-      description: 'Mobile App Development',
+      items: [
+        { description: 'Mobile App Development', quantity: 1, rate: 3500, amount: 3500 },
+      ],
+      subtotal: 3500,
+      gstEnabled: true,
+      gstRate: 18,
+      gstAmount: 630,
+      total: 4130,
+      status: 'Pending',
+      notes: '',
     },
   ],
   
   addInvoice: (invoice) => set((state) => ({
-    invoices: [...state.invoices, { ...invoice, id: generateId() }],
+    invoices: [...state.invoices, { ...invoice, id: invoice.id || generateId() }],
   })),
   
   updateInvoice: (id, updates) => set((state) => ({

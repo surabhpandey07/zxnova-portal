@@ -6,23 +6,23 @@ import { useBusinessStore } from '@/store/business';
 export default function Dashboard() {
   const { clients, invoices, projects, tasks } = useBusinessStore();
   
-  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.status === 'Paid' ? inv.amount : 0), 0);
-  const pendingAmount = invoices.reduce((sum, inv) => sum + (inv.status === 'Pending' ? inv.amount : 0), 0);
+  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.status === 'Paid' ? (inv.total || inv.amount || 0) : 0), 0);
+  const pendingAmount = invoices.reduce((sum, inv) => sum + (inv.status === 'Pending' ? (inv.total || inv.amount || 0) : 0), 0);
   const activeProjects = projects.filter(p => p.status === 'In Progress').length;
   const completedTasks = tasks.filter(t => t.status === 'completed').length;
 
   const stats = [
     { label: 'Total Clients', value: clients.length, change: '+2', color: 'from-blue-500 to-blue-600' },
     { label: 'Active Projects', value: activeProjects, change: '+1', color: 'from-purple-500 to-purple-600' },
-    { label: 'Revenue (Paid)', value: `$${totalRevenue.toLocaleString()}`, change: '+$5k', color: 'from-green-500 to-green-600' },
-    { label: 'Pending', value: `$${pendingAmount.toLocaleString()}`, change: '+$3.5k', color: 'from-orange-500 to-orange-600' },
+    { label: 'Revenue (Paid)', value: `₹${totalRevenue.toLocaleString()}`, change: '+₹5k', color: 'from-green-500 to-green-600' },
+    { label: 'Pending', value: `₹${pendingAmount.toLocaleString()}`, change: '+₹3.5k', color: 'from-orange-500 to-orange-600' },
   ];
 
   const recentActivity = [
     ...invoices.slice(0, 2).map(inv => ({
       id: inv.id,
       type: 'Invoice Created',
-      description: `Invoice for $${inv.amount}`,
+      description: `Invoice ${inv.invoiceNo} - ₹${inv.total || inv.amount || 0}`,
       time: inv.date,
     })),
     ...projects.slice(0, 1).map(proj => ({
