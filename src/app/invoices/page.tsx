@@ -440,7 +440,10 @@ export default function Invoices() {
                   Delete
                 </button>
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    setViewingInvoiceId(invoice.id);
+                    setTimeout(() => window.print(), 500);
+                  }}
                   className="flex-1 text-cyan-400 hover:bg-cyan-500/10 py-2 rounded transition"
                 >
                   Print
