@@ -287,6 +287,6 @@ export interface KanbanColumn {
   tasks: Task[];
 }
 
-export interface KanbanBoard {
+export type KanbanBoard = {
   [key in TaskStatus]: Task[];
-}
+};
