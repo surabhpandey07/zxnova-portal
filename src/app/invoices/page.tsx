@@ -130,53 +130,59 @@ export default function Invoices() {
       <style>{`
         @media print {
           * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
           }
           
           html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background: white;
+            width: 100% !important;
+            height: 100% !important;
+            background: white !important;
           }
           
-          /* Hide everything by default during print */
-          body > * {
-            display: none !important;
-          }
-          
-          /* Show only the main content wrapper */
-          .invoice-print-wrapper {
-            display: block !important;
-          }
-          
-          /* Hide all non-invoice elements */
-          .print-hide,
-          header,
-          nav,
+          /* Hide sidebar and layout */
           aside,
-          .sidebar,
+          nav,
+          header,
+          .print-hide,
           button,
           input,
           select,
           textarea,
           [class*="sidebar"],
-          [class*="Sidebar"] {
+          [class*="Sidebar"],
+          [class*="layout"],
+          [class*="Layout"],
+          .flex,
+          .space-y-6 {
             display: none !important;
           }
           
+          /* Show invoice template */
           .invoice-template-wrapper {
             display: block !important;
             background: white !important;
             color: black !important;
-            page-break-inside: avoid;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            page-break-inside: avoid !important;
+            width: 100% !important;
           }
           
           .invoice-template-wrapper * {
-            page-break-inside: avoid;
+            background: inherit !important;
+            color: inherit !important;
+            margin: 0 !important;
+            padding: inherit !important;
+          }
+          
+          /* Ensure text is visible */
+          div, p, span, h1, h2, h3, table, tr, td, th {
+            page-break-inside: avoid !important;
+            color: black !important;
+            background: white !important;
           }
         }
       `}</style>
