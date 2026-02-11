@@ -1,0 +1,270 @@
+// ZXNOVA Agency Management System - Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========== CLIENT MODEL ==========
+model Client {
+  id            String      @id @default(cuid())
+  name          String
+  email         String      @unique
+  phone         String?
+  companyName   String?
+  gstNumber     String?     // GST ID for Indian businesses
+  panNumber     String?     // PAN for Indian tax purposes
+  
+  // Address Details
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?     @default("India")
+  
+  // Business Details
+  industry      String?
+  website       String?
+  notes         String?     @db.Text
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  projects      Project[]
+  invoices      Invoice[]
+  proposals     Proposal[]
+  
+  @@index([email])
+  @@index([companyName])
+}
+
+// ========== PROJECT MODEL ==========
+model Project {
+  id            String      @id @default(cuid())
+  name          String
+  description   String?     @db.Text
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Project Details
+  status        ProjectStatus @default(ACTIVE)
+  budget        Float?
+  spentAmount   Float?      @default(0)
+  startDate     DateTime?
+  endDate       DateTime?
+  
+  // Color coding for UI
+  color         String?     @default("#1D3E3E")
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  tasks         Task[]
+  invoices      Invoice[]
+  proposals     Proposal[]
+  
+  @@index([clientId])
+  @@index([status])
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+// ========== TASK MODEL ==========
+model Task {
+  id            String      @id @default(cuid())
+  title         String
+  description   String?     @db.Text
+  projectId     String
+  project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Task Details
+  status        TaskStatus  @default(TODO)
+  priority      TaskPriority @default(MEDIUM)
+  assignee      String?     // Could be extended to User model later
+  
+  // Kanban & Next Step Logic
+  nextStep      String?     @db.Text  // Detailed next action for the task
+  nextStepDate  DateTime?            // Target date for next action
+  
+  // Dates
+  dueDate       DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([projectId])
+  @@index([status])
+  @@index([priority])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  BLOCKED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// ========== PROPOSAL MODEL ==========
+model Proposal {
+  id            String      @id @default(cuid())
+  proposalNumber String     @unique  // e.g., PROP-2024-001
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId     String
+  project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Proposal Details
+  title         String
+  description   String?     @db.Text
+  totalAmount   Float
+  validUntil    DateTime
+  status        ProposalStatus @default(DRAFT)
+  
+  // Content
+  lineItems     ProposalLineItem[]
+  notes         String?     @db.Text
+  terms         String?     @db.Text
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  acceptedAt    DateTime?
+  
+  @@index([clientId])
+  @@index([projectId])
+  @@index([status])
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+// ========== PROPOSAL LINE ITEM ==========
+model ProposalLineItem {
+  id            String      @id @default(cuid())
+  proposalId    String
+  proposal      Proposal    @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  
+  description   String
+  quantity      Float       @default(1)
+  unitPrice     Float
+  amount        Float       // quantity * unitPrice
+  
+  @@index([proposalId])
+}
+
+// ========== INVOICE MODEL ==========
+model Invoice {
+  id            String      @id @default(cuid())
+  invoiceNumber String      @unique  // e.g., INV-2024-001
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId     String?
+  project       Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  // Invoice Details
+  description   String?     @db.Text
+  status        InvoiceStatus @default(DRAFT)
+  issueDate     DateTime
+  dueDate       DateTime
+  
+  // Amount Calculations
+  subtotal      Float
+  taxAmount     Float       @default(0)  // GST amount
+  taxRate       Float       @default(18) // Default GST 18%
+  totalAmount   Float
+  paidAmount    Float       @default(0)
+  
+  // Payment Details
+  paymentMethod String?
+  transactionId String?
+  paidDate      DateTime?
+  
+  // Content
+  lineItems     InvoiceLineItem[]
+  notes         String?     @db.Text
+  terms         String?     @db.Text
+  
+  // Timestamps
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([clientId])
+  @@index([projectId])
+  @@index([status])
+  @@index([invoiceNumber])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  PARTIAL
+  OVERDUE
+  CANCELLED
+}
+
+// ========== INVOICE LINE ITEM ==========
+model InvoiceLineItem {
+  id            String      @id @default(cuid())
+  invoiceId     String
+  invoice       Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  description   String
+  quantity      Float       @default(1)
+  unitPrice     Float
+  amount        Float       // quantity * unitPrice
+  
+  @@index([invoiceId])
+}
+
+// ========== SETTINGS/CONFIG MODEL ==========
+model CompanySettings {
+  id            String      @id @default(cuid())
+  companyName   String      @default("ZXNOVA")
+  email         String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  country       String?     @default("India")
+  
+  gstNumber     String?
+  panNumber     String?
+  accountNumber String?
+  bankName      String?
+  ifscCode      String?
+  
+  // Logo and Branding
+  logoUrl       String?
+  primaryColor  String      @default("#1D3E3E")
+  accentColor   String      @default("#20B2AA")
+  
+  updatedAt     DateTime    @updatedAt
+  
+  @@unique([companyName])
+}
