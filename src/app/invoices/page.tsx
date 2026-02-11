@@ -129,22 +129,60 @@ export default function Invoices() {
     <>
       <style>{`
         @media print {
-          body {
+          * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
           }
-          .print-hide {
+          
+          html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: white;
+          }
+          
+          /* Hide everything by default during print */
+          body > * {
             display: none !important;
           }
+          
+          /* Show only the main content wrapper */
+          .invoice-print-wrapper {
+            display: block !important;
+          }
+          
+          /* Hide all non-invoice elements */
+          .print-hide,
+          header,
+          nav,
+          aside,
+          .sidebar,
+          button,
+          input,
+          select,
+          textarea,
+          [class*="sidebar"],
+          [class*="Sidebar"] {
+            display: none !important;
+          }
+          
           .invoice-template-wrapper {
             display: block !important;
             background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            color: black !important;
+            page-break-inside: avoid;
+          }
+          
+          .invoice-template-wrapper * {
+            page-break-inside: avoid;
           }
         }
       `}</style>
-      <AdminLayout>
+      
+      <div className="invoice-print-wrapper">
+        <AdminLayout>
         <div className="space-y-6 print-hide">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-white">Invoices</h1>
@@ -545,7 +583,8 @@ export default function Invoices() {
           ))}
         </div>
       </div>
-    </AdminLayout>
+        </AdminLayout>
+      </div>
     </>
   );
 }
