@@ -27,17 +27,20 @@ body {
 
 /* Print media styles */
 @media print {
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background: white !important;
-    color: black !important;
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
-  /* Hide UI elements that shouldn't print */
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Hide navigation and UI */
   .print-hide,
   aside,
   nav,
@@ -53,71 +56,56 @@ body {
   [class*="navbar"],
   [class*="Navbar"] {
     display: none !important;
-    visibility: hidden !important;
   }
 
-  /* Show AdminLayout but hide its non-invoice content */
-  body > div {
-    display: block !important;
-    background: white !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* Hide the space-y-6 container but keep invoice divs visible */
-  .space-y-6 {
-    display: none !important;
-  }
-
-  /* Ensure invoice template wrapper is visible and takes full width */
+  /* Show only invoice template */
   .invoice-template-wrapper {
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    margin: 0 !important;
-    padding: 20px !important;
     width: 100% !important;
-    height: auto !important;
     background: white !important;
-    color: black !important;
+    color: #1a1a1a !important;
+    margin: 0 !important;
+    padding: 40px !important;
     page-break-inside: avoid !important;
-    page-break-after: auto !important;
   }
 
-  /* Ensure all invoice content is visible */
-  .invoice-template-wrapper * {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  /* Make sure all invoice elements are visible */
+  .invoice-template-wrapper h1,
+  .invoice-template-wrapper h2,
+  .invoice-template-wrapper h3,
+  .invoice-template-wrapper h4,
+  .invoice-template-wrapper h5,
+  .invoice-template-wrapper h6,
+  .invoice-template-wrapper p,
+  .invoice-template-wrapper span,
+  .invoice-template-wrapper div,
+  .invoice-template-wrapper table,
+  .invoice-template-wrapper thead,
+  .invoice-template-wrapper tbody,
+  .invoice-template-wrapper tr,
+  .invoice-template-wrapper td,
+  .invoice-template-wrapper th {
     background: white !important;
-    color: black !important;
+    color: #1a1a1a !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    page-break-inside: avoid !important;
   }
 
-  /* Fix tables display */
   .invoice-template-wrapper table {
-    display: table !important;
     width: 100% !important;
     border-collapse: collapse !important;
   }
 
-  .invoice-template-wrapper tbody,
-  .invoice-template-wrapper thead {
-    display: table-row-group !important;
+  .invoice-template-wrapper th,
+  .invoice-template-wrapper td {
+    border: 1px solid #333 !important;
+    padding: 10px !important;
+    text-align: left !important;
   }
 
-  .invoice-template-wrapper tr {
-    display: table-row !important;
-  }
-
-  .invoice-template-wrapper td,
   .invoice-template-wrapper th {
-    display: table-cell !important;
-    border: 1px solid #000 !important;
-    padding: 8px !important;
-  }
-
-  /* Ensure divs inside invoice stay as blocks */
-  .invoice-template-wrapper div {
-    display: block !important;
+    background-color: #f5f5f5 !important;
+    font-weight: bold !important;
   }
 }
