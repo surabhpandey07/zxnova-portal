@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Print media styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+  }
+  
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Hide UI elements during print */
+  aside,
+  nav,
+  header,
+  footer,
+  button,
+  input,
+  select,
+  textarea,
+  .sidebar,
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  [class*="navbar"],
+  [class*="Navbar"] {
+    display: none !important;
+  }
+  
+  /* Ensure invoice content is visible */
+  .invoice-template-wrapper,
+  .invoice-content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    width: 100% !important;
+    background: white !important;
+    color: black !important;
+    page-break-inside: avoid !important;
+  }
+}
