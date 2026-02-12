@@ -403,7 +403,10 @@ export default function Invoices() {
                 <button
                   onClick={() => {
                     setViewingInvoiceId(invoice.id);
-                    setTimeout(() => window.print(), 500);
+                    // Delay to ensure template renders before printing
+                    setTimeout(() => {
+                      window.print();
+                    }, 800);
                   }}
                   className="flex-1 text-cyan-400 hover:bg-cyan-500/10 py-2 rounded transition"
                 >
