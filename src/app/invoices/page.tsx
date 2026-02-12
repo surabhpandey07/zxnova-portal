@@ -131,22 +131,59 @@ export default function Invoices() {
     printStyle.innerHTML = `
       @media print {
         body {
-          background: white;
-          margin: 0;
-          padding: 0;
+          background: white !important;
+          margin: 0 !important;
+          padding: 0 !important;
         }
         
-        /* Hide everything except invoice */
-        body > * {
+        /* Hide only specific elements */
+        .print-hide {
           display: none !important;
         }
         
+        /* Hide layout/navigation */
+        aside,
+        nav,
+        header,
+        button:not(.invoice-button),
+        input,
+        select,
+        textarea,
+        [class*="sidebar"],
+        [class*="Sidebar"] {
+          display: none !important;
+        }
+        
+        /* Show and style invoice template */
         .invoice-template-wrapper {
           display: block !important;
-          background: white;
-          color: black;
-          margin: 0;
-          padding: 0;
+          background: white !important;
+          color: black !important;
+          margin: 0 !important;
+          padding: 20px !important;
+          page-break-inside: avoid !important;
+          width: 100% !important;
+        }
+        
+        /* Ensure all invoice content is visible */
+        .invoice-template-wrapper * {
+          background: white !important;
+          color: black !important;
+          page-break-inside: avoid !important;
+        }
+        
+        /* Override any hiding styles */
+        .invoice-template-wrapper table,
+        .invoice-template-wrapper tr,
+        .invoice-template-wrapper td,
+        .invoice-template-wrapper th,
+        .invoice-template-wrapper p,
+        .invoice-template-wrapper h1,
+        .invoice-template-wrapper h2,
+        .invoice-template-wrapper h3,
+        .invoice-template-wrapper div {
+          display: block !important;
+          visibility: visible !important;
         }
       }
     `;
