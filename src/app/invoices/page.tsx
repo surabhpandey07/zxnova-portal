@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import AdminLayout from '@/components/AdminLayout';
 import { useBusinessStore } from '@/store/business';
 
@@ -28,12 +29,26 @@ interface InvoiceData {
   notes: string;
 }
 
+// Predefined Services
+const PREDEFINED_SERVICES = [
+  { id: 1, name: 'Web Design & Development', rate: 5000 },
+  { id: 2, name: 'UI/UX Design', rate: 3000 },
+  { id: 3, name: 'Mobile App Development', rate: 7500 },
+  { id: 4, name: 'Graphic Design', rate: 2000 },
+  { id: 5, name: 'Content Writing', rate: 1500 },
+  { id: 6, name: 'SEO Optimization', rate: 4000 },
+  { id: 7, name: 'Consultation', rate: 2500 },
+];
+
 const COMPANY = {
   name: 'SAURABH ARVIND PANDEY',
   website: 'zxnova.com',
   contact: '+91 6359322504',
+  email: 'info@zxnova.com',
   accountNo: '4146175103',
   bankCode: 'Kotak Mahindra Bank',
+  ifsc: 'KKBK0000001',
+  logo: 'https://i0.wp.com/zxnova.com/wp-content/uploads/2025/07/cropped-Untitled-design-8.png?w=500&ssl=1',
 };
 
 export default function Invoices() {
@@ -237,17 +252,50 @@ export default function Invoices() {
               )}
             </div>
 
-            {/* Invoice Items */}
+            {/* Invoice Items with Service Selection */}
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <h4 className="text-white font-semibold">Invoice Items</h4>
-                <button
-                  type="button"
-                  onClick={handleAddItem}
-                  className="text-zxnova-accent hover:text-zxnova-accent/80 text-sm"
-                >
-                  + Add Item
-                </button>
+                <h4 className="text-white font-semibold">Invoice Items / Services</h4>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="text-zxnova-accent hover:text-zxnova-accent/80 text-sm"
+                  >
+                    + Add Custom Item
+                  </button>
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      className="text-zxnova-accent hover:text-zxnova-accent/80 text-sm px-3 py-1 bg-white/10 rounded"
+                    >
+                      + Select Service ▼
+                    </button>
+                    <div className="absolute right-0 mt-2 w-64 bg-gray-800 border border-zxnova-primary/30 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                      {PREDEFINED_SERVICES.map(service => (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => {
+                            const newItem = {
+                              description: service.name,
+                              quantity: 1,
+                              rate: service.rate,
+                              amount: service.rate,
+                            };
+                            const newItems = [...formData.items, newItem];
+                            const totals = calculateTotals(newItems, formData.gstEnabled, formData.gstRate);
+                            setFormData({ ...formData, items: newItems, ...totals });
+                          }}
+                          className="w-full text-left px-4 py-2 text-white hover:bg-zxnova-primary/30 border-b border-gray-700 last:border-b-0 text-sm"
+                        >
+                          <span className="font-medium">{service.name}</span>
+                          <span className="float-right text-zxnova-accent">₹{service.rate}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -414,125 +462,196 @@ export default function Invoices() {
                 </button>
               </div>
 
-              {/* Invoice Template */}
+              {/* Professional Invoice Template */}
               {viewingInvoiceId === invoice.id && (
-                <div className="invoice-template-wrapper mt-6 bg-white text-gray-900 p-8 rounded-lg">
-                  {/* Header */}
-                  <div className="border-b-2 border-gray-300 pb-6 mb-6">
-                    <div className="flex justify-between items-start">
+                <div className="invoice-template-wrapper mt-6 bg-white text-gray-900 rounded-lg overflow-hidden shadow-2xl">
+                  {/* Header with Logo and Company Info */}
+                  <div className="bg-gradient-to-r from-zxnova-primary to-zxnova-accent/80 p-8 text-white relative overflow-hidden">
+                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full"></div>
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 bg-white rounded-lg p-1 flex items-center justify-center">
+                            <img 
+                              src={COMPANY.logo}
+                              alt="Logo"
+                              className="w-full h-full object-cover rounded"
+                            />
+                          </div>
+                          <div>
+                            <h1 className="text-4xl font-bold">{COMPANY.name}</h1>
+                            <p className="text-white/80">Professional Services</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-5xl font-bold">INVOICE</p>
+                          <p className="text-white/80 mt-2">#{(invoice as any).invoiceNo || invoice.id}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Company Contact Info */}
+                      <div className="grid grid-cols-4 gap-4 text-sm mt-6">
+                        <div>
+                          <p className="text-white/60 text-xs">EMAIL</p>
+                          <p className="font-semibold">{COMPANY.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/60 text-xs">PHONE</p>
+                          <p className="font-semibold">{COMPANY.contact}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/60 text-xs">WEBSITE</p>
+                          <p className="font-semibold">{COMPANY.website}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/60 text-xs">INVOICE DATE</p>
+                          <p className="font-semibold">{invoice.date}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Invoice Details and Bill To */}
+                  <div className="p-8">
+                    <div className="grid grid-cols-2 gap-8 mb-8">
+                      {/* Bill To Section */}
                       <div>
-                        <h1 className="text-4xl font-bold text-zxnova-primary mb-2">INVOICE</h1>
-                        <p className="text-gray-600 font-semibold">{COMPANY.name}</p>
-                        <p className="text-gray-600">Website: {COMPANY.website}</p>
-                        <p className="text-gray-600">Contact: {COMPANY.contact}</p>
+                        <h3 className="text-sm font-bold text-zxnova-primary uppercase tracking-wide mb-4">BILL TO</h3>
+                        <div className="bg-gray-50 border-l-4 border-zxnova-accent p-4 rounded">
+                          <p className="font-bold text-xl text-gray-900 mb-1">{selectedClient?.name || 'Client Name'}</p>
+                          <p className="text-gray-600 text-sm mb-3">{selectedClient?.address || 'Address'}</p>
+                          <div className="space-y-1 text-sm">
+                            <p><span className="font-semibold">Email:</span> {selectedClient?.email}</p>
+                            <p><span className="font-semibold">Phone:</span> {selectedClient?.phone}</p>
+                            {selectedClient && (
+                              <p><span className="font-semibold">GST IN:</span> {(selectedClient as any).gstNumber || 'N/A'}</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold">Invoice #{(invoice as any).invoiceNo || invoice.id}</p>
-                        <p className="text-gray-600 mt-2">
-                          <span className="font-semibold">Date:</span> {invoice.date}
-                        </p>
-                        <p className="text-gray-600">
-                          <span className="font-semibold">Due Date:</span> {invoice.dueDate}
-                        </p>
+
+                      {/* Invoice Info */}
+                      <div>
+                        <h3 className="text-sm font-bold text-zxnova-primary uppercase tracking-wide mb-4">INVOICE DETAILS</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between border-b border-gray-200 pb-2">
+                            <span className="text-gray-600 font-semibold">Invoice Number:</span>
+                            <span className="font-bold text-gray-900">{(invoice as any).invoiceNo}</span>
+                          </div>
+                          <div className="flex justify-between border-b border-gray-200 pb-2">
+                            <span className="text-gray-600 font-semibold">Issue Date:</span>
+                            <span className="font-bold text-gray-900">{invoice.date}</span>
+                          </div>
+                          <div className="flex justify-between border-b border-gray-200 pb-2">
+                            <span className="text-gray-600 font-semibold">Due Date:</span>
+                            <span className="font-bold text-gray-900">{invoice.dueDate}</span>
+                          </div>
+                          <div className="flex justify-between pt-2">
+                            <span className="text-gray-600 font-semibold">Status:</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                              invoice.status === 'Paid' ? 'bg-green-100 text-green-800' :
+                              invoice.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {invoice.status}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Bill To */}
-                  <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div>
-                      <h3 className="text-lg font-bold mb-3">BILL TO:</h3>
-                      <div className="border border-gray-300 p-4 rounded">
-                        <p className="font-bold text-lg mb-2">{selectedClient?.name || 'Client'}</p>
-                        <p className="text-gray-600">{selectedClient?.email}</p>
-                        <p className="text-gray-600">{selectedClient?.phone}</p>
-                        <p className="text-gray-600">{selectedClient?.address}</p>
-                        {selectedClient && (
-                          <>
-                            <p className="text-gray-600 mt-2"><span className="font-semibold">GST IN:</span> {(selectedClient as any).gstNumber || 'N/A'}</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Items Table */}
-                  <table className="w-full mb-8">
-                    <thead>
-                      <tr className="bg-zxnova-primary/10 border border-gray-300">
-                        <th className="px-4 py-3 text-left font-bold">Description</th>
-                        <th className="px-4 py-3 text-right font-bold">Quantity</th>
-                        <th className="px-4 py-3 text-right font-bold">Rate</th>
-                        <th className="px-4 py-3 text-right font-bold">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(invoice as any).items?.map((item: InvoiceItem, index: number) => (
-                        <tr key={index} className="border border-gray-300">
-                          <td className="px-4 py-2">{item.description}</td>
-                          <td className="px-4 py-2 text-right">{item.quantity}</td>
-                          <td className="px-4 py-2 text-right">₹{item.rate.toFixed(2)}</td>
-                          <td className="px-4 py-2 text-right">₹{item.amount.toFixed(2)}</td>
+                    {/* Items Table */}
+                    <table className="w-full mb-8">
+                      <thead>
+                        <tr className="bg-zxnova-primary/10 border-b-2 border-zxnova-primary">
+                          <th className="px-4 py-4 text-left font-bold text-gray-900">DESCRIPTION</th>
+                          <th className="px-4 py-4 text-center font-bold text-gray-900">QTY</th>
+                          <th className="px-4 py-4 text-right font-bold text-gray-900">RATE</th>
+                          <th className="px-4 py-4 text-right font-bold text-gray-900">AMOUNT</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {(invoice as any).items?.map((item: InvoiceItem, index: number) => (
+                          <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
+                            <td className="px-4 py-4 text-gray-900">{item.description}</td>
+                            <td className="px-4 py-4 text-center text-gray-900">{item.quantity}</td>
+                            <td className="px-4 py-4 text-right text-gray-900">₹{item.rate.toFixed(2)}</td>
+                            <td className="px-4 py-4 text-right font-semibold text-gray-900">₹{item.amount.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
-                  {/* Totals */}
-                  <div className="flex justify-end mb-8">
-                    <div className="w-80">
-                      <div className="flex justify-between py-2 border-b border-gray-300">
-                        <span className="font-semibold">Subtotal:</span>
-                        <span>₹{((invoice as any).subtotal || 0).toFixed(2)}</span>
+                    {/* Totals Section */}
+                    <div className="flex justify-end mb-8">
+                      <div className="w-96">
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-6 border border-gray-200">
+                          <div className="flex justify-between mb-4 pb-4 border-b border-gray-300">
+                            <span className="text-gray-700 font-semibold">Subtotal:</span>
+                            <span className="text-gray-900 font-bold">₹{((invoice as any).subtotal || 0).toFixed(2)}</span>
+                          </div>
+                          {(invoice as any).gstEnabled && (
+                            <div className="flex justify-between mb-4 pb-4 border-b border-gray-300">
+                              <span className="text-gray-700 font-semibold">GST ({(invoice as any).gstRate}%):</span>
+                              <span className="text-gray-900 font-bold">₹{((invoice as any).gstAmount || 0).toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between bg-gradient-to-r from-zxnova-primary to-zxnova-accent px-4 py-3 rounded text-white">
+                            <span className="font-bold text-lg">TOTAL AMOUNT DUE:</span>
+                            <span className="font-bold text-lg">₹{((invoice as any).total || 0).toFixed(2)}</span>
+                          </div>
+                        </div>
                       </div>
-                      {(invoice as any).gstEnabled && (
-                        <div className="flex justify-between py-2 border-b border-gray-300">
-                          <span className="font-semibold">GST ({(invoice as any).gstRate}%):</span>
-                          <span>₹{((invoice as any).gstAmount || 0).toFixed(2)}</span>
+                    </div>
+
+                    {/* Bank Details Section */}
+                    <div className="grid grid-cols-2 gap-8 mb-8 pt-8 border-t-2 border-gray-200">
+                      <div>
+                        <h3 className="font-bold text-zxnova-primary uppercase tracking-wide mb-4 text-sm">BANK ACCOUNT DETAILS</h3>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <p className="text-gray-600 font-semibold">Account Name</p>
+                            <p className="text-gray-900">{COMPANY.name}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">Account Number</p>
+                            <p className="text-gray-900 font-mono">{COMPANY.accountNo}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">Bank Name</p>
+                            <p className="text-gray-900">{COMPANY.bankCode}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">IFSC Code</p>
+                            <p className="text-gray-900 font-mono">{COMPANY.ifsc}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Notes Section */}
+                      {(invoice as any).notes && (
+                        <div>
+                          <h3 className="font-bold text-zxnova-primary uppercase tracking-wide mb-4 text-sm">NOTES</h3>
+                          <p className="text-gray-600 text-sm bg-blue-50 border-l-4 border-blue-300 p-4 rounded">
+                            {(invoice as any).notes}
+                          </p>
                         </div>
                       )}
-                      <div className="flex justify-between py-2 bg-zxnova-primary/10 px-2 rounded font-bold text-lg">
-                        <span>Total:</span>
-                        <span>₹{((invoice as any).total || 0).toFixed(2)}</span>
-                      </div>
                     </div>
-                  </div>
 
-                  {/* Bank Details */}
-                  <div className="border-t-2 border-gray-300 pt-6 mb-6">
-                    <h3 className="font-bold mb-3">BANK DETAILS:</h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600 font-semibold">Account Name:</p>
-                        <p className="text-gray-900">{COMPANY.name}</p>
+                    {/* Footer */}
+                    <div className="border-t-2 border-gray-200 pt-8 text-center">
+                      <div className="mb-4">
+                        <p className="text-gray-900 font-semibold text-lg">Thank You for Your Business!</p>
+                        <p className="text-gray-600 text-sm">We appreciate your patronage and look forward to serving you again.</p>
                       </div>
-                      <div>
-                        <p className="text-gray-600 font-semibold">Account No:</p>
-                        <p className="text-gray-900">{COMPANY.accountNo}</p>
+                      <div className="flex justify-center gap-6 text-xs text-gray-500 pt-4 border-t border-gray-200">
+                        <span>📧 {COMPANY.email}</span>
+                        <span>📱 {COMPANY.contact}</span>
+                        <span>🌐 {COMPANY.website}</span>
                       </div>
-                      <div>
-                        <p className="text-gray-600 font-semibold">Bank:</p>
-                        <p className="text-gray-900">{COMPANY.bankCode}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 font-semibold">Website:</p>
-                        <p className="text-gray-900">{COMPANY.website}</p>
-                      </div>
+                      <p className="text-xs text-gray-400 mt-4 italic">This is an electronically generated invoice. No signature required.</p>
                     </div>
-                  </div>
-
-                  {/* Notes */}
-                  {(invoice as any).notes && (
-                    <div className="border-t border-gray-300 pt-4">
-                      <h3 className="font-bold mb-2">NOTES:</h3>
-                      <p className="text-gray-600">{(invoice as any).notes}</p>
-                    </div>
-                  )}
-
-                  {/* Footer */}
-                  <div className="border-t-2 border-gray-300 mt-8 pt-6 text-center text-sm text-gray-600">
-                    <p className="font-semibold mb-1">Thank you for your business!</p>
-                    <p>This is an electronically generated invoice. No signature required.</p>
                   </div>
                 </div>
               )}

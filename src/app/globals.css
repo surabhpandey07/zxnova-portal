@@ -40,7 +40,7 @@ body {
     background: white !important;
   }
 
-  /* Hide navigation and UI */
+  /* Hide UI elements */
   .print-hide,
   aside,
   nav,
@@ -58,18 +58,19 @@ body {
     display: none !important;
   }
 
-  /* Show only invoice template */
+  /* Show invoice with full color */
   .invoice-template-wrapper {
     display: block !important;
     width: 100% !important;
     background: white !important;
     color: #1a1a1a !important;
     margin: 0 !important;
-    padding: 40px !important;
+    padding: 0 !important;
     page-break-inside: avoid !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 
-  /* Make sure all invoice elements are visible */
   .invoice-template-wrapper h1,
   .invoice-template-wrapper h2,
   .invoice-template-wrapper h3,
@@ -85,13 +86,19 @@ body {
   .invoice-template-wrapper tr,
   .invoice-template-wrapper td,
   .invoice-template-wrapper th {
-    background: white !important;
+    background: transparent !important;
     color: #1a1a1a !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     page-break-inside: avoid !important;
   }
 
+  /* Gradient backgrounds */
+  .invoice-template-wrapper [class*="gradient"] {
+    background: linear-gradient(90deg, #1D3E3E 0%, #20B2AA 100%) !important;
+  }
+
+  /* Tables */
   .invoice-template-wrapper table {
     width: 100% !important;
     border-collapse: collapse !important;
@@ -99,13 +106,19 @@ body {
 
   .invoice-template-wrapper th,
   .invoice-template-wrapper td {
-    border: 1px solid #333 !important;
-    padding: 10px !important;
+    border: 1px solid #999 !important;
+    padding: 12px !important;
     text-align: left !important;
   }
 
   .invoice-template-wrapper th {
     background-color: #f5f5f5 !important;
     font-weight: bold !important;
+  }
+
+  /* Images */
+  .invoice-template-wrapper img {
+    max-width: 100% !important;
+    height: auto !important;
   }
 }
